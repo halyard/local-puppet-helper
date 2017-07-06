@@ -7,5 +7,5 @@ ENV_PATH=$ROOT_PATH/environments
 : ${DEBUG:=}
 : ${PROFILE:=}
 
-export PATH="${PUPPET_BIN}:$PATH"
+export PATH="${OPT_PUPPET_BIN}:$PATH"
 
