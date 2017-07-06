@@ -12,8 +12,8 @@ if [ -n "$DEBUG" ] ; then
     fi
 fi
 
-[[ -e $ROOTDIR/environments ]] || mkdir -p $ROOTDIR/environments
-[[ -e $ROOTDIR/environments/production ]] || ln -s $ROOTDIR/repo $ROOTDIR/environments/production
+[[ -e $ROOT_PATH/environments ]] || mkdir -p $ROOT_PATH/environments
+[[ -e $ROOT_PATH/environments/production ]] || ln -s $ROOT_PATH/repo $ROOT_PATH/environments/production
 
 (
     cd $REPO_PATH
