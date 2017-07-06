@@ -1,0 +1,11 @@
+OPT_PUPPET_BIN=/opt/puppetlabs/puppet/bin
+ROOT_PATH=/opt/halyard
+REPO_PATH=$ROOT_PATH/repo
+ENV_PATH=$ROOT_PATH/environments
+
+: ${PUPPET_ENV:=production}
+: ${DEBUG:=}
+: ${PROFILE:=}
+
+export PATH="${PUPPET_BIN}:$PATH"
+

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+. ${BASH_SOURCE%/*}/environment
+
+FLAGS=''
+if [ -n "$DEBUG" ] ; then
+    FLAGS="$FLAGS --debug"
+    if [ -n "$PROFILE" ]; then
+        FLAGS="$FLAGS --profile"
+    fi
+fi
+
+(
+    cd $REPO_PATH
+
+    if [ -n "$(git status -s)" ] ; then
+        echo "Repo is unclean: $REPO_PATH"
+    else
+        git pull &>/dev/null || echo "Failed to update repo: $REPO_PATH"
+    fi
+
+    which bundle &>/dev/null || gem install bundle
+    bundle check &>/dev/null || bundle install &>/dev/null || echo "Failed to update bundle"
+
+    [[ -e $REPO_PATH/preflight/main.sh ]] && $REPO_PATH/preflight/main.sh
+
+    librarian-puppet install --clean
+
+    puppet apply \
+        "--confdir=$REPO_PATH" \
+        "--environment=$PUPPET_ENV" \
+        "$ENV_PATH/$PUPPET_ENV/manifests" \
+        $FLAGS
+)
