@@ -22,6 +22,7 @@ fi
         echo "Repo is unclean: $REPO_PATH"
     else
         git pull &>/dev/null || echo "Failed to update repo: $REPO_PATH"
+        git submodule update --init &> /dev/null || echo "Failed to update submodules: $REPO_PATH"
     fi
 
     which bundle &>/dev/null || gem install --no-user-install bundler
