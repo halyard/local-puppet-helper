@@ -31,9 +31,11 @@ fi
 
     librarian-puppet install --clean
 
+    LOG_FILE="${LOG_PATH}/$(date '+%Y%m%d-%H%M%S').log"
     puppet apply \
         "--confdir=$REPO_PATH" \
         "--environment=$PUPPET_ENV" \
         "$ENV_PATH/$PUPPET_ENV/manifests" \
-        $FLAGS
+        $FLAGS \
+        &>$LOG_FILE
 )
