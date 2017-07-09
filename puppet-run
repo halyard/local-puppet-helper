@@ -2,7 +2,9 @@
 
 set -euo pipefail
 
-. ${BASH_SOURCE%/*}/environment
+SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE}")")"
+
+. ${SCRIPT_DIR}/environment
 
 FLAGS=''
 if [ -n "$DEBUG" ] ; then
