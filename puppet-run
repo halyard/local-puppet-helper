@@ -31,6 +31,7 @@ fi
 
     librarian-puppet install --clean
 
+    mkdir -p "$LOG_PATH"
     LOG_FILE="${LOG_PATH}/$(date '+%Y%m%d-%H%M%S').log"
     puppet apply \
         "--confdir=$REPO_PATH" \
