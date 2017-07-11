@@ -5,16 +5,20 @@ set -euo pipefail
 uname="$(uname)"
 case "$uname" in
     Darwin)
-        echo "Not yet implemented, need to steal from halyard/halyard"
+        echo "Mac support not yet implemented, need to steal from halyard/halyard"
         exit 1
         ;;
     Linux)
-        # Only really supports Ubuntu 16.04, patches welcome
-        wget https://apt.puppetlabs.com/puppet5-release-xenial.deb
-        dpkg -i puppet5-release-xenial.deb
-        apt update
-        rm puppet5-release-xenial.deb
-        apt install puppet-agent
+        distro="$(grep ID= /etc/os-release | cut -d= -f2)"
+        case "$distro" in
+            archarm)
+                pacman -Syu --noconfirm --needed puppet git
+                ;;
+            *)
+                echo "Support for this Linux distro ($distro) not yet implemented"
+                exit 1
+                ;;
+        esac
         ;;
     *)
         echo "Support for $uname not implemented"
