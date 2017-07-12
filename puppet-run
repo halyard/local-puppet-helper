@@ -35,12 +35,18 @@ fi
     librarian-puppet install --clean
 
     mkdir -p "$LOG_PATH"
-    LOG_FILE="${LOG_PATH}/$(date '+%Y%m%d-%H%M%S').log"
-    puppet apply \
-        "--confdir=$REPO_PATH" \
-        "--environment=$PUPPET_ENV" \
-        "$ENV_PATH/$PUPPET_ENV/manifests" \
-        $FLAGS \
-        2>&1 \
-        | tee $LOG_FILE
+    (
+        LOG_FILE="${LOG_PATH}/puppet-run.log"
+        host="$(hostname -f)"
+        strftime="%Y-%m-%d %H:%M:%S"
+        echo "${host} $(date "+$strftime") STARTING RUN"
+        puppet apply \
+            "--confdir=$REPO_PATH" \
+            "--environment=$PUPPET_ENV" \
+            "$ENV_PATH/$PUPPET_ENV/manifests" \
+            $FLAGS \
+            2>&1 \
+            | awk "{print strftime(\"$strftime\") \" $host \" \$0}"
+        echo "${host} $(date "+$strftime") ENDING RUN"
+    ) | tee -a $LOG_FILE
 )
