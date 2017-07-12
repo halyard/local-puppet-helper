@@ -39,7 +39,7 @@ fi
     (
         host="$(hostname -f)"
         strftime="%Y-%m-%d %H:%M:%S"
-        echo "${host} $(date "+$strftime") STARTING RUN"
+        echo "$(date "+$strftime") ${host} STARTING RUN"
         puppet apply \
             "--confdir=$REPO_PATH" \
             "--environment=$PUPPET_ENV" \
@@ -47,6 +47,6 @@ fi
             $FLAGS \
             2>&1 \
             | awk "{print strftime(\"$strftime\") \" $host \" \$0}"
-        echo "${host} $(date "+$strftime") ENDING RUN"
+        echo "$(date "+$strftime") ${host} ENDING RUN"
     ) | tee -a $LOG_FILE
 )
