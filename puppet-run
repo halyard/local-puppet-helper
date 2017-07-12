@@ -35,8 +35,8 @@ fi
     librarian-puppet install --clean
 
     mkdir -p "$LOG_PATH"
+    LOG_FILE="${LOG_PATH}/puppet-run.log"
     (
-        LOG_FILE="${LOG_PATH}/puppet-run.log"
         host="$(hostname -f)"
         strftime="%Y-%m-%d %H:%M:%S"
         echo "${host} $(date "+$strftime") STARTING RUN"
