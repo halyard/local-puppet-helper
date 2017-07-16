@@ -11,7 +11,7 @@ case "$uname" in
     Linux)
         distro="$(grep ID= /etc/os-release | cut -d= -f2)"
         case "$distro" in
-            archarm)
+            archarm|arch)
                 pacman -Syu --noconfirm --needed puppet git
                 ;;
             *)
