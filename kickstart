@@ -2,17 +2,66 @@
 
 set -euo pipefail
 
+ROOT_DIR=/opt/halyard
+REPO_DIR="$ROOT_DIR/repo"
+REPO_URL=git://github.com/halyard/goblin
+
+function darwin() {
+    puppet_version=1.10.4-1
+    puppet_checksum=93e4f7e9b1fb00d4d40ea929772376da4858570412c06b5d224409d4ab6b68018ae618298bf039017fdb640a8c74e884fde353eb57ef929cf53e6fbd8408f9c9
+
+    echo 'Checking for pending software updates'
+    softwareupdate -i -a
+
+    echo 'Checking for Xcode command line tools'
+    set +e
+    xcode-select -p &>/dev/null
+    if [ "$?" != "0" ] ; then
+        echo 'Please follow the prompt to install Xcode command line tools'
+        xcode-select --install &>/dev/null
+        while true ; do
+            sleep 5
+            xcode-select -p &>/dev/null && break
+        done
+    fi
+    set -e
+
+    if [[ ! -e /opt/puppetlabs/bin/puppet ]] ; then
+        puppet_tmpdir="$(mktemp -d)"
+        puppet_url="https://downloads.puppetlabs.com/mac/10.12/PC1/x86_64/puppet-agent-${puppet_version}.osx10.12.dmg"
+        puppet_dmg="${puppet_tmpdir}/puppet-agent.dmg"
+        puppet_mount="${puppet_tmpdir}/puppet-agent.volume"
+        puppet_installer="${puppet_mount}/puppet-agent-${puppet_version}-installer.pkg"
+        curl -sLo "${puppet_dmg}" "${puppet_url}"
+        actual_checksum="$(sha512sum "${puppet_dmg}" | cut -d' ' -f1)"
+        if [[ "${actual_checksum}" != "${puppet_checksum}" ]] ; then
+            echo "Checksum mismatch on puppet download: ${puppet_dmg} / ${puppet_url}"
+            exit 1
+        fi
+        hdiutil attach -puppetstrings -nobrowse -readonly -noidme -mountpoint "${puppet_mount}" "${puppet_dmg}"
+        installer -pkg "${puppet_installer}" -target /
+        hdiutil unmount "${puppet_mount}"
+        rm -rf "${puppet_dmg}"
+    fi
+}
+
+function arch() {
+    pacman -Syu --noconfirm --needed puppet git
+}
+
+
+mkdir -p "$REPO_DIR"
+
 uname="$(uname)"
 case "$uname" in
     Darwin)
-        echo "Mac support not yet implemented, need to steal from halyard/halyard"
-        exit 1
+        darwin
         ;;
     Linux)
         distro="$(grep ID= /etc/os-release | cut -d= -f2)"
         case "$distro" in
             archarm|arch)
-                pacman -Syu --noconfirm --needed puppet git
+                arch
                 ;;
             *)
                 echo "Support for this Linux distro ($distro) not yet implemented"
@@ -26,7 +75,10 @@ case "$uname" in
         ;;
 esac
 
-mkdir -p /opt/halyard/repo
-git clone --recursive git://github.com/halyard/goblin /opt/halyard/repo
-/opt/halyard/repo/meta/puppet-run
+if [[ -e "$REPO_DIR/README.md" ]] ; then
+    (cd "$REPO_DIR/repo" && git pull && git submodule update --init)
+else
+    git clone --recursive "$REPO_URL" "$REPO_DIR"
+fi
+$REPO_DIR/meta/puppet-run
 
