@@ -4,9 +4,11 @@ set -euo pipefail
 
 ROOT_DIR=/opt/halyard
 REPO_DIR="$ROOT_DIR/repo"
-REPO_URL=git://github.com/halyard/goblin
+ORG_URL=git://github.com/halyard
 
 function darwin() {
+    REPO_NAME=halyard
+
     puppet_version=1.10.4-1
     puppet_checksum=93e4f7e9b1fb00d4d40ea929772376da4858570412c06b5d224409d4ab6b68018ae618298bf039017fdb640a8c74e884fde353eb57ef929cf53e6fbd8408f9c9
 
@@ -46,6 +48,7 @@ function darwin() {
 }
 
 function arch() {
+    REPO_NAME=goblin
     pacman -Syu --noconfirm --needed puppet git
 }
 
@@ -78,6 +81,7 @@ esac
 if [[ -e "$REPO_DIR/README.md" ]] ; then
     (cd "$REPO_DIR" && git pull && git submodule update --init)
 else
+    REPO_URL="$ORG_URL/$REPO_NAME"
     git clone --recursive "$REPO_URL" "$REPO_DIR"
 fi
 $REPO_DIR/meta/puppet-run
