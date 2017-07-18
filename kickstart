@@ -33,7 +33,7 @@ function darwin() {
         puppet_mount="${puppet_tmpdir}/puppet-agent.volume"
         puppet_installer="${puppet_mount}/puppet-agent-${puppet_version}-installer.pkg"
         curl -sLo "${puppet_dmg}" "${puppet_url}"
-        actual_checksum="$(sha512sum "${puppet_dmg}" | cut -d' ' -f1)"
+        actual_checksum="$(shasum -a 512 "${puppet_dmg}" | cut -d' ' -f1)"
         if [[ "${actual_checksum}" != "${puppet_checksum}" ]] ; then
             echo "Checksum mismatch on puppet download: ${puppet_dmg} / ${puppet_url}"
             exit 1
