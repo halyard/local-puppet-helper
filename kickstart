@@ -76,7 +76,7 @@ case "$uname" in
 esac
 
 if [[ -e "$REPO_DIR/README.md" ]] ; then
-    (cd "$REPO_DIR/repo" && git pull && git submodule update --init)
+    (cd "$REPO_DIR" && git pull && git submodule update --init)
 else
     git clone --recursive "$REPO_URL" "$REPO_DIR"
 fi
