@@ -50,8 +50,7 @@ fi
             "--environment=$PUPPET_ENV" \
             "$ENV_PATH/$PUPPET_ENV/manifests" \
             $FLAGS \
-            2>&1 \
-            | awk "{print strftime(\"$strftime\") \" $host \" \$0}"
+            2>&1
         echo "ENDING RUN"
     ) | log_prefix | tee -a $LOG_FILE
 )
