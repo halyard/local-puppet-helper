@@ -36,10 +36,15 @@ fi
 
     mkdir -p "$LOG_PATH"
     LOG_FILE="${LOG_PATH}/puppet-run.log"
-    (
+    function log_prefix() {
         host="$(hostname -f)"
-        strftime="%Y-%m-%d %H:%M:%S"
-        echo "$(date "+$strftime") ${host} STARTING RUN"
+        fmt="%Y-%m-%d %H:%M:%S"
+        while IFS= read -r line; do
+            echo "$(date "+$fmt") ${host} ${line}"
+        done
+    }
+    (
+        echo 'STARTING RUN'
         puppet apply \
             "--confdir=$REPO_PATH" \
             "--environment=$PUPPET_ENV" \
@@ -47,6 +52,6 @@ fi
             $FLAGS \
             2>&1 \
             | awk "{print strftime(\"$strftime\") \" $host \" \$0}"
-        echo "$(date "+$strftime") ${host} ENDING RUN"
-    ) | tee -a $LOG_FILE
+        echo "ENDING RUN"
+    ) | log_prefix | tee -a $LOG_FILE
 )
