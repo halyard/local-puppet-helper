@@ -40,12 +40,12 @@ fi
         host="$(hostname -f)"
         fmt="%Y-%m-%d %H:%M:%S"
         while IFS= read -r line; do
-            clean_line="$(echo -e $line | sed 's/\[1;[0-9][0-9]m//g')"
             prefix="$(date "+$fmt") ${host}"
-            echo "${prefix} ${clean_line}" >&3
             echo "${prefix} ${line}"
         done
     }
+
+    exec 3>&1
     (
         echo 'STARTING RUN'
         puppet apply \
@@ -55,5 +55,7 @@ fi
             $FLAGS \
             2>&1
         echo "ENDING RUN"
-    ) | log_prefix 3>> $LOG_FILE 
+    ) | log_prefix \
+        | tee /dev/fd3 \
+        | sed -E "s/"$'\E'"\[([0-9]{1,2}(;[0-9]{1,2})*)?m//g"
 )
