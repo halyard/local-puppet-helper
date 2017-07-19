@@ -36,6 +36,7 @@ fi
 
     mkdir -p "$LOG_PATH"
     LOG_FILE="${LOG_PATH}/puppet-run.log"
+
     function log_prefix() {
         host="$(hostname -f)"
         fmt="%Y-%m-%d %H:%M:%S"
@@ -57,5 +58,6 @@ fi
         echo "ENDING RUN"
     ) | log_prefix \
         | tee /dev/fd3 \
-        | sed -E "s/"$'\E'"\[([0-9]{1,2}(;[0-9]{1,2})*)?m//g"
+        | sed -E "s/"$'\E'"\[([0-9]{1,2}(;[0-9]{1,2})*)?m//g" \
+        >> $LOG_FILE
 )
