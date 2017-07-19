@@ -57,7 +57,7 @@ fi
             2>&1
         echo "ENDING RUN"
     ) | log_prefix \
-        | tee /dev/fd3 \
+        | tee /dev/fd/3 \
         | sed -E "s/"$'\E'"\[([0-9]{1,2}(;[0-9]{1,2})*)?m//g" \
         >> $LOG_FILE
 )
