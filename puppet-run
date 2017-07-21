@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-
 if [[ "$UID" != "0" ]] ; then
     exec sudo DEBUG="${DEBUG-}" PROFILE="${PROFILE-}" "$0"
 fi
@@ -17,6 +16,9 @@ if [ -n "${DEBUG-}" ] ; then
     if [ -n "${PROFILE-}" ]; then
         FLAGS="$FLAGS --profile"
     fi
+else
+    unset DEBUG
+    unset PROFILE
 fi
 
 [[ -e $ROOT_PATH/environments ]] || mkdir -p $ROOT_PATH/environments
