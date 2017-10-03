@@ -9,8 +9,8 @@ ORG_URL=git://github.com/halyard
 function darwin() {
     REPO_NAME=halyard
 
-    puppet_version=1.10.4-1
-    puppet_checksum=93e4f7e9b1fb00d4d40ea929772376da4858570412c06b5d224409d4ab6b68018ae618298bf039017fdb640a8c74e884fde353eb57ef929cf53e6fbd8408f9c9
+    puppet_version=5.3.1-1
+    puppet_checksum=9eb3f0f479d271cae1d6f702462984d9a4233c0b1d4ef41c314d08c587e0540de5456bdfe914865beef35bf59b14c87355e98e6343e6d0f2b619efa4ea15dc24
 
     echo 'Checking for pending software updates'
     softwareupdate -i -a
@@ -30,7 +30,7 @@ function darwin() {
 
     if [[ ! -e /opt/puppetlabs/bin/puppet ]] ; then
         puppet_tmpdir="$(mktemp -d)"
-        puppet_url="https://downloads.puppetlabs.com/mac/10.12/PC1/x86_64/puppet-agent-${puppet_version}.osx10.12.dmg"
+        puppet_url="https://downloads.puppetlabs.com/mac/puppet5/10.12/x86_64/puppet-agent-${puppet_version}.osx10.12.dmg"
         puppet_dmg="${puppet_tmpdir}/puppet-agent.dmg"
         puppet_mount="${puppet_tmpdir}/puppet-agent.volume"
         puppet_installer="${puppet_mount}/puppet-agent-${puppet_version}-installer.pkg"

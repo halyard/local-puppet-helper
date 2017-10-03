@@ -1,0 +1,21 @@
+item do
+  noop
+
+  deps do
+    item do
+      name 'puppet'
+
+      expected do
+        url_xpath
+        url 'https://rubygems.org/gems/puppet'
+        xpath '/html/body/main/div/h1/i'
+      end
+
+      actual do
+        grep
+        file 'kickstart'
+        regex /^ *puppet_version=(.*)-\d+$/
+      end
+    end
+  end
+end
