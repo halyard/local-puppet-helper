@@ -10,7 +10,7 @@ function darwin() {
     REPO_NAME=halyard
 
     # https://docs.puppet.com/puppet/latest/about_agent.html
-    # https://downloads.puppetlabs.com/mac/puppet5/10.12/x86_64/
+    # https://downloads.puppetlabs.com/mac/puppet5/10.13/x86_64/
     puppet_version=5.5.1-1
     puppet_checksum=18c539bd17c1f7522284c7bb4e830adf5805b7d1dc6c1c53b128d1cf01070f49
 
@@ -32,7 +32,7 @@ function darwin() {
 
     if [[ ! -e /opt/puppetlabs/bin/puppet ]] ; then
         puppet_tmpdir="$(mktemp -d)"
-        puppet_url="https://downloads.puppetlabs.com/mac/puppet5/10.12/x86_64/puppet-agent-${puppet_version}.osx10.12.dmg"
+        puppet_url="https://downloads.puppetlabs.com/mac/puppet5/10.15/x86_64/puppet-agent-${puppet_version}.osx10.13.dmg"
         puppet_dmg="${puppet_tmpdir}/puppet-agent.dmg"
         puppet_mount="${puppet_tmpdir}/puppet-agent.volume"
         puppet_installer="${puppet_mount}/puppet-agent-${puppet_version}-installer.pkg"
