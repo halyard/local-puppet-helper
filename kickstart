@@ -32,7 +32,7 @@ function darwin() {
 
     if [[ ! -e /opt/puppetlabs/bin/puppet ]] ; then
         puppet_tmpdir="$(mktemp -d)"
-        puppet_url="https://downloads.puppetlabs.com/mac/puppet5/10.15/x86_64/puppet-agent-${puppet_version}.osx10.13.dmg"
+        puppet_url="https://downloads.puppetlabs.com/mac/puppet5/10.13/x86_64/puppet-agent-${puppet_version}.osx10.13.dmg"
         puppet_dmg="${puppet_tmpdir}/puppet-agent.dmg"
         puppet_mount="${puppet_tmpdir}/puppet-agent.volume"
         puppet_installer="${puppet_mount}/puppet-agent-${puppet_version}-installer.pkg"
