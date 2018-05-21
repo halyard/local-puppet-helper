@@ -44,8 +44,6 @@ function darwin() {
         fi
         hdiutil attach -puppetstrings -nobrowse -readonly -noidme -mountpoint "${puppet_mount}" "${puppet_dmg}"
         installer -pkg "${puppet_installer}" -target /
-        # Run it again, fixes an issue with Hiera not being installed properly
-        installer -pkg "${puppet_installer}" -target /
         hdiutil unmount "${puppet_mount}"
         rm -rf "${puppet_dmg}"
     fi
