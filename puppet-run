@@ -7,6 +7,7 @@ if [[ "$UID" != "0" ]] ; then
 fi
 
 SCRIPT_DIR="$(python -c 'import os, sys; print(os.path.dirname(os.path.realpath(sys.argv[1])))' "$BASH_SOURCE")"
+LOCKDIR_NAME=.lock
 
 . ${SCRIPT_DIR}/environment
 
@@ -26,6 +27,12 @@ fi
 
 (
     cd $REPO_PATH
+
+    mkdir "$LOCKDIR_NAME" || (
+        echo "It appears a puppet-run is already in progress"
+        echo "If this is not the case, run: rm -r $REPO_PATH/.lock"
+        exit 1
+    )
 
     if [ -n "$(git status -s)" ] ; then
         echo "Repo is unclean: $REPO_PATH"
@@ -67,4 +74,6 @@ fi
         | tee /dev/fd/3 \
         | sed -E "s/"$'\E'"\[([0-9]{1,2}(;[0-9]{1,2})*)?m//g" \
         >> $LOG_FILE
+
+    rm -r "$LOCKDIR_NAME"
 )
