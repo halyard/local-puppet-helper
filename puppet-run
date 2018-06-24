@@ -57,7 +57,7 @@ fi
     bundle exec librarian-puppet install --clean
 
     mkdir -p "$LOG_PATH"
-    LOG_FILE="${LOG_PATH}/puppet-run.log"
+    LOG_FILE="${LOG_PATH}/puppet-run.$(date "+%Y%m%d")"
 
     function log_prefix() {
         host="$(hostname -f)"
