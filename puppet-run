@@ -34,6 +34,14 @@ fi
         exit 1
     )
 
+    function finish() {
+        (
+            cd $REPO_PATH
+            rm -r $LOCKDIR_NAME
+        )
+    }
+    trap finish EXIT
+
     if [ -n "$(git status -s)" ] ; then
         echo "Repo is unclean: $REPO_PATH"
     else
@@ -74,6 +82,4 @@ fi
         | tee /dev/fd/3 \
         | sed -E "s/"$'\E'"\[([0-9]{1,2}(;[0-9]{1,2})*)?m//g" \
         >> $LOG_FILE
-
-    rm -r "$LOCKDIR_NAME"
 )
