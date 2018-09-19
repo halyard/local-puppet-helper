@@ -10,9 +10,9 @@ function darwin() {
     REPO_NAME=halyard
 
     # https://docs.puppet.com/puppet/latest/about_agent.html
-    # https://downloads.puppetlabs.com/mac/puppet5/10.13/x86_64/
-    puppet_version=5.5.6-1
-    puppet_checksum=3b43ab03a6376e52fe9a079c7ba07300585f8cf7ee4d7a76e825599755f493b5
+    # https://downloads.puppetlabs.com/mac/puppet6/10.13/x86_64/
+    puppet_version=6.0.0-1
+    puppet_checksum=eecb5caac515465e5e3475757df7765974d22b57b5d67b9fbc13a247ad768555
 
     echo 'Checking for pending software updates'
     softwareupdate -i -a
