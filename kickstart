@@ -11,8 +11,8 @@ function darwin() {
 
     # https://docs.puppet.com/puppet/latest/about_agent.html
     # https://downloads.puppetlabs.com/mac/puppet6/10.13/x86_64/
-    puppet_version=6.0.1-1
-    puppet_checksum=053d956993f1c2e338e307723580e233f390b140ef0b5a56a13cd82ae3b755c5
+    puppet_version=6.0.2-1
+    puppet_checksum=42b0af1c55089c2afcfc1fc64e6617cb3ebcd26d9ea19cf0aee78cb609eba99f
 
     echo 'Checking for pending software updates'
     softwareupdate -i -a
