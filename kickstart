@@ -11,8 +11,8 @@ function darwin() {
 
     # https://docs.puppet.com/puppet/latest/about_agent.html
     # https://downloads.puppetlabs.com/mac/puppet6/10.13/x86_64/
-    puppet_version=6.0.3-1
-    puppet_checksum=f69e71eaca3ae139db8da692b3b54d332740ba7ace9be8e34f956e9289af6c7d
+    puppet_version=6.0.4-1
+    puppet_checksum=1636f352a8ab19907e251a685358a964642c1291b9046786838667ff1f0d0ea4
 
     echo 'Checking for pending software updates'
     softwareupdate -i -a
@@ -32,7 +32,7 @@ function darwin() {
 
     if [[ ! -e /opt/puppetlabs/bin/puppet ]] ; then
         puppet_tmpdir="$(mktemp -d)"
-        puppet_url="https://downloads.puppetlabs.com/mac/puppet5/10.13/x86_64/puppet-agent-${puppet_version}.osx10.13.dmg"
+        puppet_url="https://downloads.puppetlabs.com/mac/puppet6/10.13/x86_64/puppet-agent-${puppet_version}.osx10.13.dmg"
         puppet_dmg="${puppet_tmpdir}/puppet-agent.dmg"
         puppet_mount="${puppet_tmpdir}/puppet-agent.volume"
         puppet_installer="${puppet_mount}/puppet-agent-${puppet_version}-installer.pkg"
