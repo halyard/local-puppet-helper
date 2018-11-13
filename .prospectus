@@ -7,9 +7,8 @@ item do
 
       expected do
         url_xpath
-        url 'https://puppet.com/docs/puppet/latest/release_notes_agent.html'
-        xpath '//div[@class="toc toc-tree"]/ol/li[1]/a'
-        regex /^Puppet agent ([\d.]+)$/
+        url 'https://rubygems.org/gems/puppet'
+        xpath '/html/body/main/div/h1/i'
       end
 
       actual do
