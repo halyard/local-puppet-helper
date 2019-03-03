@@ -10,9 +10,9 @@ function darwin() {
     REPO_NAME=halyard
 
     # https://docs.puppet.com/puppet/latest/about_agent.html
-    # https://downloads.puppetlabs.com/mac/puppet6/10.13/x86_64/
-    puppet_version=6.2.0-1
-    puppet_checksum=e6b54e00495cfb0876af3189388d19284c48b146f4b1c9180040f161c24e7b42
+    # https://downloads.puppetlabs.com/mac/puppet6/10.14/x86_64/
+    puppet_version=6.3.0-1
+    puppet_checksum=b8ffdb76613adac062dea5be6ccfab8d310fd4c203396a28614f6c62f56f4deb
 
     echo 'Checking for pending software updates'
     softwareupdate -i -a
@@ -32,7 +32,7 @@ function darwin() {
 
     if [[ ! -e /opt/puppetlabs/bin/puppet ]] ; then
         puppet_tmpdir="$(mktemp -d)"
-        puppet_url="https://downloads.puppetlabs.com/mac/puppet6/10.13/x86_64/puppet-agent-${puppet_version}.osx10.13.dmg"
+        puppet_url="https://downloads.puppetlabs.com/mac/puppet6/10.14/x86_64/puppet-agent-${puppet_version}.osx10.14.dmg"
         puppet_dmg="${puppet_tmpdir}/puppet-agent.dmg"
         puppet_mount="${puppet_tmpdir}/puppet-agent.volume"
         puppet_installer="${puppet_mount}/puppet-agent-${puppet_version}-installer.pkg"
