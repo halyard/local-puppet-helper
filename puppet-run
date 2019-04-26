@@ -50,7 +50,7 @@ fi
     fi
 
     which bundle &>/dev/null || gem install --no-user-install --no-document bundler
-    bundle check &>/dev/null || bundle install &>/dev/null || echo "Failed to update bundle"
+    bundle check &>/dev/null || bundle install || ( echo "Failed to update bundle" && exit 1 )
 
     [[ -e $REPO_PATH/preflight/main.sh ]] && $REPO_PATH/preflight/main.sh
 
