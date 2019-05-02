@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT_DIR=/opt/halyard
 REPO_DIR="$ROOT_DIR/repo"
-ORG_URL=https://github.com/halyard
+ORG_URL="${ORG_URL:-https://github.com/halyard}"
 
 function darwin() {
     REPO_NAME=halyard
