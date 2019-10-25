@@ -49,7 +49,7 @@ fi
         git submodule update --init &> /dev/null || echo "Failed to update submodules: $REPO_PATH"
     fi
 
-    which bundle &>/dev/null || gem install --no-user-install --no-document bundler
+    [[ -e $OPT_PUPPET_BIN/bundle ]] || gem install --no-user-install -no-document --bindir bundler
     bundle check &>/dev/null || bundle install || ( echo "Failed to update bundle" && exit 1 )
 
     [[ -e $REPO_PATH/preflight/main.sh ]] && $REPO_PATH/preflight/main.sh
