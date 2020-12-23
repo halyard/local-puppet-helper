@@ -6,7 +6,9 @@ if [[ "$UID" != "0" ]] ; then
     exec sudo DEBUG="${DEBUG-}" PROFILE="${PROFILE-}" "$0"
 fi
 
-SCRIPT_DIR="$(python -c 'import os, sys; print(os.path.dirname(os.path.realpath(sys.argv[1])))' "$BASH_SOURCE")"
+SCRIPT="$(realpath $BASH_SOURCE)"
+SCRIPT_DIR="$(dirname "$SCRIPT")"
+
 LOCKDIR_NAME=.lock
 
 . ${SCRIPT_DIR}/environment
