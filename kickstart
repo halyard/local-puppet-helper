@@ -51,7 +51,7 @@ function darwin() {
 
 function arch() {
     REPO_NAME=goblin
-    pacman -Syu --noconfirm --needed puppet git
+    pacman -Syu --noconfirm --needed puppet git inetutils
 }
 
 
