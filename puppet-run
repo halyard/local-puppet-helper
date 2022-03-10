@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 
+require 'date'
 require 'fileutils'
-
 
 OPT_PUPPET_BIN = '/opt/puppetlabs/puppet/bin'
 ROOT_PATH = '/opt/halyard'
-LOCKDIR_NAME=.lock
+LOCKDIR_NAME - '.lock'
 
 PUPPET_ENV = ENV['PUPPET_ENV'] || 'production'
 PUPPET_DEBUG = ENV['PUPPET_DEBUG'] ? true : false
