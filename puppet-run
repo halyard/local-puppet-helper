@@ -47,14 +47,14 @@ Signal.trap('TERM') {
 }
 
 def run_or_fail(cmd, err)
-  return if system(cmd)
+  return if system(cmd, [:out, :err] => '/dev/null')
   puts err
   exit 1
 end
 
-if `git status -s`.empty?
-  run_or_fail 'git pull', "Failed to update repo: #{ROOT_PATH}/repo"
-  run_or_fail 'git submodule update --init', "Failed to update submodules: $REPO_PATH"
+if `git status -s 2>&1`.empty?
+  run_or_fail 'git pull >/dev/null 2>/dev/null', "Failed to update repo: #{ROOT_PATH}/repo"
+  run_or_fail 'git submodule update --init >/dev/null 2>/dev/null', "Failed to update submodules: $REPO_PATH"
 else
   puts "Repo is unclean: #{ROOT_PATH}/repo"
 end
