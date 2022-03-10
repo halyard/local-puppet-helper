@@ -33,9 +33,9 @@ rescue Errno::EEXIST
 end
 
 
-def clean_exit
+def clean_exit(code = 1)
   FileUtils.rm_r "#{ROOT_PATH}/repo/#{LOCKDIR_NAME}"
-  exit 1
+  exit code
 end
 
 Signal.trap('INT') {
@@ -103,3 +103,5 @@ IO.popen(cmd, :err=>[:child, :out]) do |io|
 end
 
 logger.write('ENDING RUN')
+
+clean_exit 0
