@@ -63,7 +63,7 @@ unless File.exist? "#{OPT_PUPPET_BIN}/bundle"
   system('gem', 'install', '--no-user-install', '--no-document', '--bindir', OPT_PUPPET_BIN, 'bundler')
 end
 
-system('bundle check') || run_or_fail('bundle install', 'Failed to update bundle')
+system('bundle check', [:out, :err] => '/dev/null') || run_or_fail('bundle install', 'Failed to update bundle')
 system('bundle exec librarian-puppet install')
 
 class Logger
