@@ -1,87 +1,105 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ruby
 
-set -euo pipefail
+require 'fileutils'
 
-if [[ "$UID" != "0" ]] ; then
-    exec sudo DEBUG="${DEBUG-}" PROFILE="${PROFILE-}" "$0"
-fi
 
-SCRIPT="$(realpath $BASH_SOURCE)"
-SCRIPT_DIR="$(dirname "$SCRIPT")"
-
+OPT_PUPPET_BIN = '/opt/puppetlabs/puppet/bin'
+ROOT_PATH = '/opt/halyard'
 LOCKDIR_NAME=.lock
 
-. ${SCRIPT_DIR}/environment
+PUPPET_ENV = ENV['PUPPET_ENV'] || 'production'
+PUPPET_DEBUG = ENV['PUPPET_DEBUG'] ? true : false
+PUPPET_PROFILE = ENV['PUPPET_PROFILE'] ? true : false
 
-FLAGS=''
-if [ -n "${DEBUG-}" ] ; then
-    FLAGS="$FLAGS --debug"
-    if [ -n "${PROFILE-}" ]; then
-        FLAGS="$FLAGS --profile"
-    fi
+ENV['PATH'] = "#{OPT_PUPPET_BIN}:#{ENV['PATH']}"
+
+LOG_FILE = "#{ROOT_PATH}/logs/puppet-run.#{Date.today.strftime '%Y%m%d'}"
+
+FileUtils.mkdir_p "#{ROOT_PATH}/logs"
+FileUtils.mkdir_p "#{ROOT_PATH}/environments"
+
+unless Dir.exist? "#{ROOT_PATH}/environments/production"
+  FileUtils.ln_s "#{ROOT_PATH}/repo", "#{ROOT_PATH}/environments/production"
+end
+
+Dir.chdir "#{ROOT_PATH}/repo"
+
+begin
+  FileUtils.mkdir LOCKDIR_NAME
+rescue Errno::EEXIST
+  puts 'It appears a puppet-run is already in progres'
+  puts "If this is not the case, run: rm -r #{ROOT_PATH}/repo/.lock"
+  exit 1
+end
+
+
+def clean_exit
+  FileUtils.rm_r "#{ROOT_PATH}/repo/#{LOCKDIR_NAME}"
+  exit 1
+end
+
+Signal.trap('INT') {
+  clean_exit
+}
+
+Signal.trap('TERM') {
+  clean_exit
+}
+
+def run_or_fail(cmd, err)
+  return if system(cmd)
+  puts err
+  exit 1
+end
+
+if `git status -s`.empty?
+  run_or_fail 'git pull', "Failed to update repo: #{ROOT_PATH}/repo"
+  run_or_fail 'git submodule update --init', "Failed to update submodules: $REPO_PATH"
 else
-    unset DEBUG
-    unset PROFILE
-fi
+  puts "Repo is unclean: #{ROOT_PATH}/repo"
+end
 
-[[ -e $ROOT_PATH/environments ]] || mkdir -p $ROOT_PATH/environments
-[[ -e $ROOT_PATH/environments/production ]] || ln -s $ROOT_PATH/repo $ROOT_PATH/environments/production
+unless File.exist? "#{OPT_PUPPET_BIN}/bundle"
+  system('gem', 'install', '--no-user-install', '--no-document', '--bindir', OPT_PUPPET_BIN, 'bundler')
+end
 
-(
-    cd $REPO_PATH
+system('bundle check') || run_or_fail('bundle install', 'Failed to update bundle')
+system('bundle exec librarian-puppet install')
 
-    mkdir "$LOCKDIR_NAME" || (
-        echo "It appears a puppet-run is already in progress"
-        echo "If this is not the case, run: rm -r $REPO_PATH/.lock"
-        exit 1
-    )
+class Logger
+  def initialize
+    @handle = File.open(LOG_FILE, 'w')
+    @stream = STDOUT
+  end
 
-    function finish() {
-        (
-            cd $REPO_PATH
-            rm -r $LOCKDIR_NAME
-        )
-    }
-    trap finish EXIT
+  def write(line)
+    stamp = DateTime.now.strftime('%Y-%m-%d %H:%M:%S')
+    @handle << stamp + ' ' + line + "\n"
+    @stream << line + "\n"
+  end
+end
 
-    if [ -n "$(git status -s)" ] ; then
-        echo "Repo is unclean: $REPO_PATH"
-    else
-        git pull &>/dev/null || echo "Failed to update repo: $REPO_PATH"
-        git submodule update --init &> /dev/null || echo "Failed to update submodules: $REPO_PATH"
-    fi
+logger = Logger.new
 
-    [[ -e $OPT_PUPPET_BIN/bundle ]] || gem install --no-user-install -no-document --bindir $OPT_PUPPET_BIN bundler
-    bundle check &>/dev/null || bundle install || ( echo "Failed to update bundle" && exit 1 )
+logger.write('STARTING RUN')
 
-    [[ -e $REPO_PATH/preflight/main.sh ]] && $REPO_PATH/preflight/main.sh
+cmd = [
+  'bundle',
+  'exec',
+  'puppet',
+  'apply',
+  "--confdir=#{ROOT_PATH}/repo",
+  "--environment=#{PUPPET_ENV}",
+  "#{ROOT_PATH}/environments/#{PUPPET_ENV}/manifests"
+]
+cmd << '--debug' if PUPPET_DEBUG
+cmd << '--profile' if PUPPET_PROFILE
 
-    bundle exec librarian-puppet install --clean
 
-    mkdir -p "$LOG_PATH"
-    LOG_FILE="${LOG_PATH}/puppet-run.$(date "+%Y%m%d")"
+IO.popen(cmd, :err=>[:child, :out]) do |io|
+  while (line = io.gets) do
+    logger.write(line)
+  end
+end
 
-    function log_prefix() {
-        host="$(hostname -f)"
-        fmt="%Y-%m-%d %H:%M:%S"
-        while IFS= read -r line; do
-            prefix="$(date "+$fmt") ${host}"
-            echo "${prefix} ${line}"
-        done
-    }
-
-    exec 3>&1
-    (
-        echo 'STARTING RUN'
-        bundle exec puppet apply \
-            "--confdir=$REPO_PATH" \
-            "--environment=$PUPPET_ENV" \
-            "$ENV_PATH/$PUPPET_ENV/manifests" \
-            $FLAGS \
-            2>&1
-        echo "ENDING RUN"
-    ) | log_prefix \
-        | tee /dev/fd/3 \
-        | sed -E "s/"$'\E'"\[([0-9]{1,2}(;[0-9]{1,2})*)?m//g" \
-        >> $LOG_FILE
-)
+logger.write('ENDING RUN')
