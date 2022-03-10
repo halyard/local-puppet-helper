@@ -27,7 +27,7 @@ Dir.chdir "#{ROOT_PATH}/repo"
 begin
   FileUtils.mkdir LOCKDIR_NAME
 rescue Errno::EEXIST
-  puts 'It appears a puppet-run is already in progres'
+  puts 'It appears a puppet-run is already in progress'
   puts "If this is not the case, run: rm -r #{ROOT_PATH}/repo/.lock"
   exit 1
 end
