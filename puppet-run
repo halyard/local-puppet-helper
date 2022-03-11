@@ -68,14 +68,14 @@ run_or_fail('bundle exec librarian-puppet install', 'Failed to update puppet mod
 
 class Logger
   def initialize
-    @handle = File.open(LOG_FILE, 'w')
+    @handle = File.open(LOG_FILE, 'a')
     @stream = STDOUT
   end
 
   def write(line)
     stamp = DateTime.now.strftime('%Y-%m-%d %H:%M:%S')
-    @handle << stamp + ' ' + line + "\n"
-    @stream << line + "\n"
+    @handle << stamp + ' ' + line
+    @stream << line
   end
 end
 
