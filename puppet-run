@@ -14,6 +14,8 @@ PUPPET_PROFILE = ENV['PUPPET_PROFILE'] ? true : false
 ENV['PATH'] = "#{OPT_PUPPET_BIN}:#{ENV['PATH']}"
 
 LOG_FILE = "#{ROOT_PATH}/logs/puppet-run.#{Date.today.strftime '%Y%m%d'}"
+REDIRECTS = PUPPET_DEBUG ? {} : { [:out, :err] => '/dev/null' }
+
 
 FileUtils.mkdir_p "#{ROOT_PATH}/logs"
 FileUtils.mkdir_p "#{ROOT_PATH}/environments"
@@ -47,14 +49,14 @@ Signal.trap('TERM') {
 }
 
 def run_or_fail(cmd, err)
-  return if system(cmd, [:out, :err] => '/dev/null')
+  return if system(cmd, REDIRECTS)
   puts err
   clean_exit
 end
 
 if `git status -s 2>&1`.empty?
-  run_or_fail 'git pull >/dev/null 2>/dev/null', "Failed to update repo: #{ROOT_PATH}/repo"
-  run_or_fail 'git submodule update --init >/dev/null 2>/dev/null', "Failed to update submodules: $REPO_PATH"
+  run_or_fail 'git pull', "Failed to update repo: #{ROOT_PATH}/repo"
+  run_or_fail 'git submodule update --init', "Failed to update submodules: $REPO_PATH"
 else
   puts "Repo is unclean: #{ROOT_PATH}/repo"
 end
@@ -63,7 +65,7 @@ unless File.exist? "#{OPT_PUPPET_BIN}/bundle"
   system('gem', 'install', '--no-user-install', '--no-document', '--bindir', OPT_PUPPET_BIN, 'bundler')
 end
 
-system('bundle check', [:out, :err] => '/dev/null') || run_or_fail('bundle install', 'Failed to update bundle')
+system('bundle check', REDIRECTS) || run_or_fail('bundle install', 'Failed to update bundle')
 run_or_fail('bundle exec librarian-puppet install', 'Failed to update puppet modules')
 
 class Logger
