@@ -81,7 +81,7 @@ end
 
 logger = Logger.new
 
-logger.write('STARTING RUN')
+logger.write("STARTING RUN\n")
 
 cmd = [
   'bundle',
@@ -102,6 +102,6 @@ IO.popen(cmd, :err=>[:child, :out]) do |io|
   end
 end
 
-logger.write('ENDING RUN')
+logger.write("ENDING RUN\n")
 
 clean_exit 0
