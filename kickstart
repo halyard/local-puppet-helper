@@ -48,7 +48,7 @@ function darwin() {
 }
 
 function arch() {
-    pacman -Syu --noconfirm --needed puppet git inetutils
+    pacman -Syu --noconfirm --needed puppet git inetutils base-devel
 }
 
 
