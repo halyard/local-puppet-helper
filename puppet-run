@@ -49,7 +49,7 @@ Signal.trap('TERM') {
 def run_or_fail(cmd, err)
   return if system(cmd, [:out, :err] => '/dev/null')
   puts err
-  exit 1
+  clean_exit
 end
 
 if `git status -s 2>&1`.empty?
