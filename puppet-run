@@ -66,7 +66,7 @@ unless File.exist? "#{OPT_PUPPET_BIN}/bundle"
 end
 
 system('bundle check', REDIRECTS) || run_or_fail('bundle install', 'Failed to update bundle')
-run_or_fail('bundle exec librarian-puppet install', 'Failed to update puppet modules')
+run_or_fail('bundle exec librarian-puppet install --clean', 'Failed to update puppet modules')
 
 class Logger
   def initialize
