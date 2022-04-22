@@ -11,6 +11,8 @@ PUPPET_ENV = ENV['PUPPET_ENV'] || 'production'
 PUPPET_DEBUG = ENV['PUPPET_DEBUG'] ? true : false
 PUPPET_PROFILE = ENV['PUPPET_PROFILE'] ? true : false
 
+HALYARD_DEBUG = ENV['HALYARD_DEBUG'] ? true : false
+
 ENV['PATH'] = "#{OPT_PUPPET_BIN}:#{ENV['PATH']}"
 
 LOG_FILE = "#{ROOT_PATH}/logs/puppet-run.#{Date.today.strftime '%Y%m%d'}"
@@ -26,6 +28,13 @@ end
 
 Dir.chdir "#{ROOT_PATH}/repo"
 
+def debug(msg)
+  stamp = DateTime.now.strftime('%Y-%m-%d %H:%M:%S')
+  puts(stamp + ' ' +  msg) if HALYARD_DEBUG
+end
+
+debug('Locking')
+
 begin
   FileUtils.mkdir LOCKDIR_NAME
 rescue Errno::EEXIST
@@ -33,7 +42,6 @@ rescue Errno::EEXIST
   puts "If this is not the case, run: rm -r #{ROOT_PATH}/repo/.lock"
   exit 1
 end
-
 
 def clean_exit(code = 1)
   FileUtils.rm_r "#{ROOT_PATH}/repo/#{LOCKDIR_NAME}"
@@ -54,7 +62,10 @@ def run_or_fail(cmd, err)
   clean_exit
 end
 
+debug('Checking repo')
+
 if `git status -s 2>&1`.empty?
+  debug('Updating repo')
   run_or_fail 'git pull', "Failed to update repo: #{ROOT_PATH}/repo"
   run_or_fail 'git submodule update --init', "Failed to update submodules: $REPO_PATH"
 else
@@ -62,10 +73,14 @@ else
 end
 
 unless File.exist? "#{OPT_PUPPET_BIN}/bundle"
+  debug('Installing bundler')
   system('gem', 'install', '--no-user-install', '--no-document', '--bindir', OPT_PUPPET_BIN, 'bundler')
 end
 
+debug('Checking bundled gems')
 system('bundle check', REDIRECTS) || run_or_fail('bundle install', 'Failed to update bundle')
+
+debug('Checking puppet modules')
 run_or_fail('bundle exec librarian-puppet install --clean', 'Failed to update puppet modules')
 
 class Logger
@@ -83,6 +98,7 @@ end
 
 logger = Logger.new
 
+debug('Starting run')
 logger.write("STARTING RUN\n")
 
 cmd = [
@@ -104,6 +120,7 @@ IO.popen(cmd, :err=>[:child, :out]) do |io|
   end
 end
 
+debug('Ending run')
 logger.write("ENDING RUN\n")
 
 clean_exit 0
