@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'date'
 require 'fileutils'
@@ -16,8 +17,7 @@ HALYARD_DEBUG = ENV['HALYARD_DEBUG'] ? true : false
 ENV['PATH'] = "#{OPT_PUPPET_BIN}:#{ENV['PATH']}"
 
 LOG_FILE = "#{ROOT_PATH}/logs/puppet-run.#{Date.today.strftime '%Y%m%d'}"
-REDIRECTS = PUPPET_DEBUG ? {} : { [:out, :err] => '/dev/null' }
-
+REDIRECTS = HALYARD_DEBUG ? {} : { %i[out err] => '/dev/null' }
 
 FileUtils.mkdir_p "#{ROOT_PATH}/logs"
 FileUtils.mkdir_p "#{ROOT_PATH}/environments"
@@ -30,7 +30,7 @@ Dir.chdir "#{ROOT_PATH}/repo"
 
 def debug(msg)
   stamp = DateTime.now.strftime('%Y-%m-%d %H:%M:%S')
-  puts(stamp + ' ' +  msg) if HALYARD_DEBUG
+  puts("#{stamp} #{msg}") if HALYARD_DEBUG
 end
 
 debug('Locking')
@@ -48,16 +48,13 @@ def clean_exit(code = 1)
   exit code
 end
 
-Signal.trap('INT') {
-  clean_exit
-}
+Signal.trap('INT') { clean_exit }
 
-Signal.trap('TERM') {
-  clean_exit
-}
+Signal.trap('TERM') { clean_exit }
 
 def run_or_fail(cmd, err)
   return if system(cmd, REDIRECTS)
+
   puts err
   clean_exit
 end
@@ -67,7 +64,7 @@ debug('Checking repo')
 if `git status -s 2>&1`.empty?
   debug('Updating repo')
   run_or_fail 'git pull', "Failed to update repo: #{ROOT_PATH}/repo"
-  run_or_fail 'git submodule update --init', "Failed to update submodules: $REPO_PATH"
+  run_or_fail 'git submodule update --init', "Failed to update submodules: #{ROOT_PATH}/repo"
 else
   puts "Repo is unclean: #{ROOT_PATH}/repo"
 end
@@ -80,18 +77,21 @@ end
 debug('Checking bundled gems')
 system('bundle check', REDIRECTS) || run_or_fail('bundle install', 'Failed to update bundle')
 
-debug('Checking puppet modules')
-run_or_fail('bundle exec librarian-puppet install --clean', 'Failed to update puppet modules')
+debug('Purging puppet modules')
+run_or_fail('bundle exec r10k puppetfile purge', 'Failed to purge puppet modules') if Dir.exist? 'modules'
+debug('Installing puppet modules')
+run_or_fail('bundle exec r10k puppetfile install', 'Failed to update puppet modules')
 
+## Logger copies lines to logfile and stdout
 class Logger
   def initialize
     @handle = File.open(LOG_FILE, 'a')
-    @stream = STDOUT
+    @stream = $stdout
   end
 
   def write(line)
     stamp = DateTime.now.strftime('%Y-%m-%d %H:%M:%S')
-    @handle << stamp + ' ' + line
+    @handle << "#{stamp} #{line}"
     @stream << line
   end
 end
@@ -113,9 +113,8 @@ cmd = [
 cmd << '--debug' if PUPPET_DEBUG
 cmd << '--profile' if PUPPET_PROFILE
 
-
-IO.popen(cmd, :err=>[:child, :out]) do |io|
-  while (line = io.gets) do
+IO.popen(cmd, err: %i[child out]) do |io|
+  while (line = io.gets)
     logger.write(line)
   end
 end

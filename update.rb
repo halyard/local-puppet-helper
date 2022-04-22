@@ -1,14 +1,15 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'json'
 require 'open-uri'
 
 PATH = 'Puppetfile'
-REGEX = /^hmod '(?<name>\w+)', '(?<version>[\w.]+)'$/
+REGEX = /^hmod '(?<name>\w+)', '(?<version>[\w.]+)'$/.freeze
 URL = 'https://forgeapi.puppetlabs.com/v3/modules/halyard-%s'
 
 def latest_release(name)
-  JSON.load(URI.open(URL % name)).fetch('current_release', {})['version']
+  JSON.parse(URI.open(URL % name)).fetch('current_release', {})['version']
 rescue OpenURI::HTTPError
   puts "No release found for #{name}"
 end
