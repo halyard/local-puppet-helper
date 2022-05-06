@@ -63,7 +63,7 @@ end
 
 if ARGV.first == 'disable'
   puts 'Pausing puppet runs'
-  FileUtils.mkdir PAUSEDIR_NAME
+  FileUtils.mkdir_p PAUSEDIR_NAME
   clean_exit 0
 elsif ARGV.first == 'enable'
   puts 'Enabling puppet runs'
