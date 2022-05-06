@@ -44,10 +44,6 @@ rescue Errno::EEXIST
   exit 1
 end
 
-if Dir.exist? PAUSEDIR_NAME
-  puts 'Puppet runs paused'
-  exit 1
-end
 
 def clean_exit(code = 1)
   FileUtils.rm_r "#{ROOT_PATH}/repo/#{LOCKDIR_NAME}"
@@ -66,11 +62,16 @@ def run_or_fail(cmd, err)
 end
 
 if ARGV.first == 'disable'
+  puts 'Pausing puppet runs'
   FileUtils.mkdir PAUSEDIR_NAME
-  exit 0
+  clean_exit 0
 elsif ARGV.first == 'enable'
+  puts 'Enabling puppet runs'
   FileUtils.rm_rf PAUSEDIR_NAME
-  exit 0
+  clean_exit 0
+elsif Dir.exist? PAUSEDIR_NAME
+  puts 'Puppet runs paused'
+  clean_exit 1
 end
 
 debug('Checking repo')
