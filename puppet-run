@@ -7,6 +7,7 @@ require 'fileutils'
 OPT_PUPPET_BIN = '/opt/puppetlabs/puppet/bin'
 ROOT_PATH = '/opt/halyard'
 LOCKDIR_NAME = '.lock'
+PAUSEDIR_NAME = '.pause'
 
 PUPPET_ENV = ENV['PUPPET_ENV'] || 'production'
 PUPPET_DEBUG = ENV['PUPPET_DEBUG'] ? true : false
@@ -43,6 +44,11 @@ rescue Errno::EEXIST
   exit 1
 end
 
+if Dir.exist? PAUSEDIR_NAME
+  puts 'Puppet runs paused'
+  exit 1
+end
+
 def clean_exit(code = 1)
   FileUtils.rm_r "#{ROOT_PATH}/repo/#{LOCKDIR_NAME}"
   exit code
@@ -57,6 +63,14 @@ def run_or_fail(cmd, err)
 
   puts err
   clean_exit
+end
+
+if ARGV.first == 'disable'
+  FileUtils.mkdir PAUSEDIR_NAME
+  exit 0
+elsif ARGV.first == 'enable'
+  FileUtils.rm_rf PAUSEDIR_NAME
+  exit 0
 end
 
 debug('Checking repo')
