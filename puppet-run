@@ -16,6 +16,7 @@ PUPPET_PROFILE = ENV['PUPPET_PROFILE'] ? true : false
 HALYARD_DEBUG = ENV['HALYARD_DEBUG'] ? true : false
 
 ENV['PATH'] = "#{OPT_PUPPET_BIN}:#{ENV['PATH']}"
+ENV['AWS_CONFIG_FILE'] = '/root/.aws/credentials'
 
 LOG_FILE = "#{ROOT_PATH}/logs/puppet-run.#{Date.today.strftime '%Y%m%d'}"
 REDIRECTS = HALYARD_DEBUG ? {} : { %i[out err] => '/dev/null' }
