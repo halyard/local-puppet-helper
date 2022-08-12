@@ -87,7 +87,7 @@ end
 
 unless File.exist? "#{OPT_PUPPET_BIN}/bundle"
   debug('Installing bundler')
-  system('gem', 'install', '--no-user-install', '--no-document', '--bindir', OPT_PUPPET_BIN, 'bundler')
+  system('gem', 'install', '--user-install', '--no-document', '--bindir', OPT_PUPPET_BIN, 'bundler')
 end
 
 debug('Checking bundled gems')
