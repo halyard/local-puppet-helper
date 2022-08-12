@@ -5,6 +5,7 @@ require 'date'
 require 'fileutils'
 
 OPT_PUPPET_BIN = '/opt/puppetlabs/puppet/bin'
+GEM_PATH = '/opt/puppetlabs/gem'
 ROOT_PATH = '/opt/halyard'
 LOCKDIR_NAME = '.lock'
 PAUSEDIR_NAME = '.pause'
@@ -17,6 +18,7 @@ HALYARD_DEBUG = ENV['HALYARD_DEBUG'] ? true : false
 
 ENV['PATH'] = "#{OPT_PUPPET_BIN}:#{ENV['PATH']}"
 ENV['AWS_CONFIG_FILE'] = '/root/.aws/credentials'
+ENV['GEM_PATH'] = GEM_PATH
 
 LOG_FILE = "#{ROOT_PATH}/logs/puppet-run.#{Date.today.strftime '%Y%m%d'}"
 REDIRECTS = HALYARD_DEBUG ? {} : { %i[out err] => '/dev/null' }
@@ -87,7 +89,7 @@ end
 
 unless File.exist? "#{OPT_PUPPET_BIN}/bundle"
   debug('Installing bundler')
-  system('gem', 'install', '--user-install', '--no-document', '--bindir', OPT_PUPPET_BIN, 'bundler')
+  system('gem', 'install', '--no-user-install', '--no-document', '--bindir', OPT_PUPPET_BIN, 'bundler')
 end
 
 debug('Checking bundled gems')
