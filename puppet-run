@@ -18,7 +18,7 @@ HALYARD_DEBUG = ENV['HALYARD_DEBUG'] ? true : false
 
 ENV['PATH'] = "#{OPT_PUPPET_BIN}:#{ENV['PATH']}"
 ENV['AWS_CONFIG_FILE'] = '/root/.aws/credentials'
-ENV['GEM_PATH'] = GEM_PATH
+ENV['GEM_PATH'] = "#{GEM_PATH}:#{`gem env path`.chomp}"
 ENV['GEM_HOME'] = GEM_PATH
 
 LOG_FILE = "#{ROOT_PATH}/logs/puppet-run.#{Date.today.strftime '%Y%m%d'}"
