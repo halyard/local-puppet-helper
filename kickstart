@@ -51,6 +51,12 @@ function arch() {
     pacman -Syu --noconfirm --needed puppet git inetutils base-devel
 }
 
+function ubuntu() {
+    apt update
+    apt upgrade -y
+    apt dist-upgrade -y
+    apt install -y puppet build-essential
+}
 
 mkdir -p "$REPO_DIR"
 
@@ -64,6 +70,9 @@ case "$uname" in
         case "$distro" in
             archarm|arch)
                 arch
+                ;;
+            ubuntu)
+                ubuntu
                 ;;
             *)
                 echo "Support for this Linux distro ($distro) not yet implemented"
