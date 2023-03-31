@@ -62,6 +62,8 @@ function ubuntu() {
     dpkg -i "/tmp/$repo_file"
     apt update
     apt install -y puppet-agent
+    ln -s /opt/puppetlabs/puppet/bin/ruby /opt/puppetlabs/bin/
+    source /etc/profile.d/puppet-agent.sh
 }
 
 mkdir -p "$REPO_DIR"
