@@ -56,14 +56,7 @@ function ubuntu() {
     apt update
     apt upgrade -y
     apt dist-upgrade -y
-    apt install -y build-essential
-    repo_file="puppet7-release-$(lsb_release -sc).deb"
-    curl -sLo "/tmp/$repo_file" "https://apt.puppet.com/$repo_file"
-    dpkg -i "/tmp/$repo_file"
-    apt update
     apt install -y puppet-agent
-    ln -s /opt/puppetlabs/puppet/bin/ruby /opt/puppetlabs/bin/
-    source /etc/profile.d/puppet-agent.sh
 }
 
 mkdir -p "$REPO_DIR"
