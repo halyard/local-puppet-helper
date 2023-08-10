@@ -90,6 +90,7 @@ end
 
 unless File.exist? "#{OPT_PUPPET_BIN}/bundle"
   debug('Installing bundler')
+  FileUtils.mkdir_p OPT_PUPPET_BIN
   system('gem', 'install', '--no-user-install', '--no-document', '--bindir', OPT_PUPPET_BIN, 'bundler')
 end
 
