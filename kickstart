@@ -56,7 +56,7 @@ function ubuntu() {
     apt update
     apt upgrade -y
     apt dist-upgrade -y
-    apt install -y puppet-agent
+    apt install -y puppet-agent ruby-dev build-essential
 }
 
 mkdir -p "$REPO_DIR"
