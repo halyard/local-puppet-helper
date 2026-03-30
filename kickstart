@@ -6,50 +6,9 @@ ROOT_DIR=/opt/halyard
 REPO_DIR="$ROOT_DIR/repo"
 REPO_URL="${REPO_URL:-https://github.com/halyard/halyard}"
 
-function darwin() {
-    # https://docs.puppet.com/puppet/latest/about_agent.html
-    # https://downloads.puppetlabs.com/mac/puppet6/10.15/x86_64/
-    puppet_version=6.17.0-1
-    puppet_checksum=64821dea2994406f8ec6d9d3dbdea14b1e0a00493d26f4ed282d7b3eb513166d
-
-    echo 'Checking for pending software updates'
-    softwareupdate -i -a
-
-    echo 'Checking for Xcode command line tools'
-    set +e
-    xcode-select -p &>/dev/null
-    if [ "$?" != "0" ] ; then
-        echo 'Please follow the prompt to install Xcode command line tools'
-        xcode-select --install &>/dev/null
-        while true ; do
-            sleep 5
-            xcode-select -p &>/dev/null && break
-        done
-    fi
-    set -e
-
-    if [[ ! -e /opt/puppetlabs/bin/puppet ]] ; then
-        puppet_tmpdir="$(mktemp -d)"
-        puppet_url="https://downloads.puppetlabs.com/mac/puppet6/10.15/x86_64/puppet-agent-${puppet_version}.osx10.15.dmg"
-        puppet_dmg="${puppet_tmpdir}/puppet-agent.dmg"
-        puppet_mount="${puppet_tmpdir}/puppet-agent.volume"
-        puppet_installer="${puppet_mount}/puppet-agent-${puppet_version}-installer.pkg"
-        curl -sLo "${puppet_dmg}" "${puppet_url}"
-        actual_checksum="$(shasum -a 256 "${puppet_dmg}" | cut -d' ' -f1)"
-        if [[ "${actual_checksum}" != "${puppet_checksum}" ]] ; then
-            echo "Checksum mismatch on puppet download: ${puppet_dmg} / ${puppet_url}"
-            exit 1
-        fi
-        hdiutil attach -puppetstrings -nobrowse -readonly -noidme -mountpoint "${puppet_mount}" "${puppet_dmg}"
-        installer -pkg "${puppet_installer}" -target /
-        hdiutil unmount "${puppet_mount}"
-        rm -rf "${puppet_dmg}"
-    fi
-}
-
 function arch() {
     pacman -Syy --noconfirm --needed archlinux-keyring
-    pacman -Syu --noconfirm --needed puppet git inetutils base-devel
+    pacman -Syu --noconfirm --needed git inetutils base-devel
 }
 
 function ubuntu() {
@@ -57,16 +16,13 @@ function ubuntu() {
     apt update
     apt upgrade -y
     apt dist-upgrade -y
-    apt install -y puppet-agent ruby-dev build-essential
+    apt install -y ruby-dev build-essential
 }
 
 mkdir -p "$REPO_DIR"
 
 uname="$(uname)"
 case "$uname" in
-    Darwin)
-        darwin
-        ;;
     Linux)
         distro="$(grep '^ID=' /etc/os-release | cut -d= -f2)"
         case "$distro" in
