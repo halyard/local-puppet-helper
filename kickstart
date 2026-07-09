@@ -8,7 +8,7 @@ REPO_URL="${REPO_URL:-https://github.com/halyard/halyard}"
 
 function arch() {
     pacman -Syy --noconfirm --needed archlinux-keyring
-    pacman -Syu --noconfirm --needed git inetutils base-devel
+    pacman -Syu --noconfirm --needed git inetutils base-devel ruby
 }
 
 function ubuntu() {
