@@ -1,0 +1,21 @@
+---
+name: Build
+'on':
+  push:
+    branches:
+    - main
+  pull_request:
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+    - name: Build
+      run: /usr/bin/true
+    - name: Post to hook-exporter
+      uses: akerl/.github/actions/hook-exporter@main
+      with:
+        token: ${{ secrets.EXPORTER_TOKEN }}
+        status: ${{ job.status }}
